@@ -13,18 +13,16 @@ permissions:
   contents: read
 
 jobs:
-
   changes:
     permissions:
-      contents: read  # for dorny/paths-filter to fetch a list of changed files
-      pull-requests: read  # for dorny/paths-filter to read pull requests
-    runs-on: ubuntu-latest
+      contents: read # for dorny/paths-filter to fetch a list of changed files
+      pull-requests: read # for dorny/paths-filter to read pull requests
+    runs-on: self-hosted
     outputs:
       go: ${{ steps.filter.outputs.go }}
       charts: ${{ steps.filter.outputs.charts }}
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
 
@@ -44,11 +42,9 @@ jobs:
               - 'charts/ingress-nginx/Chart.yaml'
               - 'charts/ingress-nginx/**/*'
 
-
   security:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-
       - name: Checkout
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
 
@@ -62,11 +58,10 @@ jobs:
 
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: changes
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
 
@@ -74,7 +69,7 @@ jobs:
         id: go
         uses: actions/setup-go@268d8c0ca0432bb2cf416faae41297df9d262d7f # v3.2.0
         with:
-          go-version: '1.19.0'
+          go-version: "1.19.0"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@8b122486cedac8393e77aa9734c3528886e4a1a8 #v2.0.0
@@ -121,7 +116,7 @@ jobs:
 
   helm:
     name: Helm chart
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs:
       - changes
       - build
@@ -129,14 +124,13 @@ jobs:
       (needs.changes.outputs.charts == 'true')
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
 
       - name: Setup Go
         uses: actions/setup-go@268d8c0ca0432bb2cf416faae41297df9d262d7f # v3.2.0
         with:
-          go-version: '1.19.0'
+          go-version: "1.19.0"
 
       - name: cache
         uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3
@@ -196,10 +190,9 @@ jobs:
           kind get kubeconfig > $HOME/.kube/kind-config-kind
           make kind-e2e-chart-tests
 
-
   kubernetes:
     name: Kubernetes
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs:
       - changes
       - build
@@ -211,7 +204,6 @@ jobs:
         k8s: [v1.23.10, v1.24.4, v1.25.0]
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
 
@@ -236,7 +228,7 @@ jobs:
       - name: Prepare cluster for testing
         uses: azure/setup-helm@b5b231a831f96336bbfeccc1329990f0005c5bb1 #v2.1
         with:
-          version: 'v3.8.0'
+          version: "v3.8.0"
         id: local-path
 
       - name: Load images from cache
@@ -253,10 +245,9 @@ jobs:
           kind get kubeconfig > $HOME/.kube/kind-config-kind
           make kind-e2e-test
 
-
   kubernetes-chroot:
     name: Kubernetes chroot
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs:
       - changes
       - build
@@ -268,7 +259,6 @@ jobs:
         k8s: [v1.24.4, v1.25.0]
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v3.0.2
 
@@ -293,7 +283,7 @@ jobs:
       - name: Prepare cluster for testing
         uses: azure/setup-helm@b5b231a831f96336bbfeccc1329990f0005c5bb1 #v2.1
         with:
-          version: 'v3.8.0'
+          version: "v3.8.0"
         id: local-path
 
       - name: Load images from cache
@@ -311,12 +301,11 @@ jobs:
           kind get kubeconfig > $HOME/.kube/kind-config-kind
           make kind-e2e-test
 
-
   test-image-build:
     permissions:
-      contents: read  # for dorny/paths-filter to fetch a list of changed files
-      pull-requests: read  # for dorny/paths-filter to read pull requests
-    runs-on: ubuntu-latest
+      contents: read # for dorny/paths-filter to fetch a list of changed files
+      pull-requests: read # for dorny/paths-filter to read pull requests
+    runs-on: self-hosted
     env:
       PLATFORMS: linux/amd64,linux/arm64
     steps:
@@ -378,12 +367,11 @@ jobs:
         run: |
           cd images/ext-auth-example-authsvc && make build
 
-
   test-image:
     permissions:
-      contents: read  # for dorny/paths-filter to fetch a list of changed files
-      pull-requests: read  # for dorny/paths-filter to read pull requests
-    runs-on: ubuntu-latest
+      contents: read # for dorny/paths-filter to fetch a list of changed files
+      pull-requests: read # for dorny/paths-filter to read pull requests
+    runs-on: self-hosted
     env:
       PLATFORMS: linux/amd64
     steps:
@@ -411,7 +399,7 @@ jobs:
         if: ${{ steps.filter-images.outputs.kube-webhook-certgen == 'true' }}
         uses: actions/setup-go@268d8c0ca0432bb2cf416faae41297df9d262d7f # v3.2.0
         with:
-          go-version: '1.19.0'
+          go-version: "1.19.0"
 
       - name: kube-webhook-certgen image build
         if: ${{ steps.filter-images.outputs.kube-webhook-certgen == 'true' }}
