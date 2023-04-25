@@ -94,7 +94,8 @@ function _M.set_cookie(self, value)
 
   local cookie_data = {
     key = self:cookie_name(),
-    value = value .. COOKIE_VALUE_DELIMITER .. self.backend_key,
+    -- value = value .. COOKIE_VALUE_DELIMITER .. self.backend_key,
+    value = value,
     path = cookie_path,
     httponly = true,
     samesite = cookie_samesite,
